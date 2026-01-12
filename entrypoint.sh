@@ -23,7 +23,7 @@ fi
 # Inject APP_BASE using sed (no rebuild needed)
 APP_BASE_NO_SLASH="${APP_BASE#/}"
 
-if [ -n "$APP_BASE" ]; then
+if [ -n "$APP_BASE" ] && [ "$APP_BASE" != "/" ]; then
     echo "Injecting APP_BASE='${APP_BASE}' into built files..."
     
     # Handle nested paths (e.g., /level1/level2)
