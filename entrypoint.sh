@@ -42,10 +42,10 @@ if [ -n "$APP_BASE" ] && [ "$APP_BASE" != "/" ]; then
     fi
     
     # Replace placeholder in all built files
-    find /app/build -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" \) \
+    find /app/build -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" -o -name "*.map" \) \
         -exec sed -i "s|${PLACEHOLDER}|${APP_BASE}|g" {} + 2>/dev/null || true
     
-    find /app/build -type f -name "*.js" \
+    find /app/build -type f \( -name "*.js" -o -name "*.map" \) \
         -exec sed -i "s|__PLACEHOLDER__|${APP_BASE_NO_SLASH}|g" {} + 2>/dev/null || true
     
     echo "Path injection complete"
@@ -59,10 +59,10 @@ else
         echo "  Moved client assets to root"
     fi
     
-    find /app/build -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" \) \
+    find /app/build -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" -o -name "*.map" \) \
         -exec sed -i "s|${PLACEHOLDER}||g" {} + 2>/dev/null || true
     
-    find /app/build -type f -name "*.js" \
+    find /app/build -type f \( -name "*.js" -o -name "*.map" \) \
         -exec sed -i "s|__PLACEHOLDER__/||g" {} + 2>/dev/null || true
     
     echo "Root path configuration complete"
