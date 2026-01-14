@@ -23,6 +23,12 @@ fi
 # Inject APP_BASE using sed (no rebuild needed)
 APP_BASE_NO_SLASH="${APP_BASE#/}"
 
+# Step 1: Decompress all .gz files FIRST (they contain dirty content)
+echo "Decompressing pre-built gzip files..."
+find /app/build -name "*.gz" -type f -exec gunzip -f {} \; 2>/dev/null || true
+find /app/build -name "*.br" -type f -delete 2>/dev/null || true
+echo "  Decompression complete"
+
 if [ -n "$APP_BASE" ] && [ "$APP_BASE" != "/" ]; then
     echo "Injecting APP_BASE='${APP_BASE}' into built files..."
     
@@ -41,11 +47,10 @@ if [ -n "$APP_BASE" ] && [ "$APP_BASE" != "/" ]; then
         echo "  Moved client assets to ${APP_BASE_NO_SLASH}"
     fi
     
-    # Replace placeholder in all built files
-    find /app/build -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" -o -name "*.map" \) \
+    # Step 2: Replace placeholder in ALL text files (now decompressed)
+    find /app/build -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" -o -name "*.json" -o -name "*.map" \) \
         -exec sed -i "s|${PLACEHOLDER}|${APP_BASE}|g" {} + 2>/dev/null || true
-    
-    find /app/build -type f \( -name "*.js" -o -name "*.map" \) \
+    find /app/build -type f \( -name "*.js" -o -name "*.json" -o -name "*.map" \) \
         -exec sed -i "s|__PLACEHOLDER__|${APP_BASE_NO_SLASH}|g" {} + 2>/dev/null || true
     
     echo "Path injection complete"
@@ -59,14 +64,20 @@ else
         echo "  Moved client assets to root"
     fi
     
-    find /app/build -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" -o -name "*.map" \) \
+    # Step 2: Replace placeholder in ALL text files (now decompressed)
+    find /app/build -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" -o -name "*.json" -o -name "*.map" \) \
         -exec sed -i "s|${PLACEHOLDER}||g" {} + 2>/dev/null || true
-    
-    find /app/build -type f \( -name "*.js" -o -name "*.map" \) \
+    find /app/build -type f \( -name "*.js" -o -name "*.json" -o -name "*.map" \) \
         -exec sed -i "s|__PLACEHOLDER__/||g" {} + 2>/dev/null || true
     
     echo "Root path configuration complete"
 fi
+
+# Step 3: Re-compress files for production
+echo "Re-compressing files..."
+find /app/build -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" -o -name "*.json" -o -name "*.map" \) \
+    -exec gzip -9 -k {} \; 2>/dev/null || true
+echo "  Compression complete"
 
 export PUBLIC_VERSION=$(node -p "require('./package.json').version")
 
