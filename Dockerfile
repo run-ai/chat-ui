@@ -44,6 +44,7 @@ COPY --link --chown=1000 package-lock.json package.json ./
 # Build with placeholder path - will be replaced at runtime
 ARG APP_BASE=/__PLACEHOLDER__
 ARG PUBLIC_APP_COLOR=
+ENV APP_BASE=${APP_BASE}
 ENV BODY_SIZE_LIMIT=15728640
 
 RUN --mount=type=cache,target=/app/.npm \
