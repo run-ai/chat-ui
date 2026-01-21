@@ -159,7 +159,8 @@ type ExtraConfigKeys =
 	| "METRICS_PORT"
 	| "MCP_SERVERS"
 	| "MCP_FORWARD_HF_USER_TOKEN"
-	| "EXA_API_KEY";
+	| "EXA_API_KEY"
+	| "DEFAULT_MAX_TOKENS";
 
 type ConfigProxy = ConfigManager & { [K in ConfigKey | ExtraConfigKeys]: string };
 
